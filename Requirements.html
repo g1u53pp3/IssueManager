@@ -1,0 +1,223 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Requirements</title>
+<style type="text/css">
+<!--
+body {
+	margin: 0.5cm;
+	/*
+	font-size: 13px;
+	*/
+	}
+p   {
+    margin-top: 0.1em;
+    margin-bottom: 0.5em;
+    }
+b   {
+	font-family: monospace;
+	color: MidnightBlue;
+	background: #f8f8f8;
+	border-radius: 2pt;
+	padding: 1pt;
+/*
+    font-size=85%;
+	border: 1pt dotted silver;
+*/
+	}
+	
+i   {
+	color: Navy;
+	font-family: monospace;
+	}
+	
+h1  {
+	font-family: sans-serif;
+	text-align: center;
+    line-height: 1.1em;
+	}
+	
+h2  {
+	color: RoyalBlue;
+	font-family: sans-serif;
+	border-top: 1px dotted gray;
+	}
+.hint {
+    color:LightSlateGray;
+    margin-left:10ch;
+    margin-right:10ch;
+    text-indent:-5ch;
+    }
+.hint b {
+	font-family: inherit;
+	color: MidnightBlue;
+	background: inherit;
+	border-radius: inherit;
+	padding: inherit;
+    }
+.hint i {
+	color: gray;
+    }
+
+@media print {
+body {
+	font-size: 10pt;
+	}
+
+  h2 {
+  	float:left;
+    margin-top: 0;
+    padding: 5px 15px 5px 0px;
+    line-height: 0.8em;
+  	}
+}
+table {
+	float: right;
+	margin: 20px;
+	border-collapse:collapse;
+	border-bottom: 1px solid Navy;
+	border-top: 1px solid Navy;
+	}
+td, th  {
+	padding: 1px 5px 1px 5px;
+	}
+tr:nth-child(even) {
+    background-color: PowderBlue;
+    margin: 1pt solid PowderBlue;
+}
+-->
+</style>
+</head>
+<body>
+<h1>Issue Management</h1>
+<p>
+Develop a program to manage the issues that a company receive for the components of a system it owns.
+The main class is <b>IssueManager</b>; all the classes classes are in the package <b>ticketing</b>.
+    The class <b>Example</b> contains a sample code that illustrates the usage of the main methods.<br>
+    The exceptions thrown by the program are of type <b>TicketException</b>.
+
+<p>
+You can access a copy of the <a href="http://softeng.polito.it/courses/docs/api/index.html" target="api">JDK documentation</a>  on a local server.
+</p>
+
+
+
+<h2>R1: Users</h2>
+
+The system can be used by two classes of users: <i>Reporter</i> and <i>Maintainer</i>. A single user can belong to one or both classes.
+<p>The method <b>createUser()</b> accepts a username and the set of <b>UserClass</b>es the user belongs to.
+<br/>
+    There are two variants of this method one accepting a <i>Set</i> and the other accepting
+    a variable list of arguments.
+<br/>
+    The method throws an exception if the username has already been created or if no user class has been specified.
+    </p>
+
+<p>Given a user name it is possible to retrieve the set of user classes for the user by means of the method <b>getUserClasses()</b></p>
+
+
+
+<h2>R2: Components</h2>
+    
+The issues are related to components of the system under control. Components can recursively contain sub-components.
+<p>The method <b>defineComponent()</b> creates a new top level component and adds it to the system, the method accepts
+    a name and throws an exception if a component with the same name already exists.</p>
+
+<img src="img/Example.png" style="float:right;height:8em;">
+
+<p>The method <b>defineSubComponent()</b> creates a new sub-component; the method accepts the name of 
+    the new component and the path of components and sub-components to the parent component. 
+    It throws an exception if the 
+    the parent component does not exist or if a sub-component of the same parent exists with the same name.
+<br/>
+    Example: given the system shown on the right, to add the new sub-component <i>SubC</i> the following
+    invocation is required: <i>tm.defineSubComponent("SubC","\System");</i>, while to add the sub-component
+    <i>SubB.2</i> the following code is required: <i>tm.defineSubComponent("SubB.2","\System\SubB");</i>.
+    
+</p>
+
+<p>Given a (sub-)component it is possible to retrieve the set of sub-components names with <b>getSubComponents()</b> 
+    and the parent component path with <b>getParentComponent()</b>, this latter method return <i>null</i> if the 
+    component has no parent.</p>
+    
+<p>Please note that a path starts with <i>'/'</i> and contains the list of (sub-)components, starting
+    from the top-level component, separated by <i>'/'</i>.</p>
+
+
+<h2>R3: Ticket opening</h2>
+    
+<p>When a malfunction of some component is detected, a user can open a new ticket that contains the details
+    about the malfunction.</p>
+    
+<p>A ticket is opened through the method <b>openTicket()</b> that requires as arguments
+    the user name, the path of the malfunctioning (sub-)component, a description of the failure, and 
+    the <b>Severity</b> of the failure.
+    The method return a unique id (a positive integer starting from 1) for the ticket.
+    <br/>
+    The methods throws an exception if the user name is not valid, the path does not correspond to a defined
+    component, or the user does not belong to the <i>Reporter</i> user class.
+    </p>
+<p>Using method <b>getTicket()</b> returns a <b>Ticket</b> object for the specific ticket id (or null
+    if the id is not valid), while 
+    the collection of tickets can be retrieved using the method <b>getAllTickets()</b> that returns
+    the list of tickets sorted by severity (from <i>Blocking</i> to <i>Cosmetic</i>, see hint below)</p>
+
+<p>The class <i>Ticket</i> provides the getter methods
+<b>getDescription()</b>, <b>getId()</b>, <b>getSeverity()</b>, <b>getComponent()</b>, and <b>getAuthor()</b> returning
+    description, id, severity, (sub-)component path, and user name respectively.
+</p>
+
+<p class="hint"><b>Hint</b>:
+    The enum values are object that implement <i>Comparable</i>, so a natural ordering
+    is provided which corresponds to the order the enumerated values are declared 
+        (e.g. <i>Blocking</i> precedes <i>Major</i>) </dl>
+</p>
+    
+
+
+<h2>R4: Ticket lifecycle</h2>
+    
+<p>A ticket can be in three possible states: <i>Open</i>, <i>Assigned</i>, <i>Closed</i>.
+    When initially opened a ticket is in placed in state <i>Open</i>.
+</p>
+
+<p>The method <b>assignTicket()</b> accepts a ticket id and a username, changes the ticket state to <i>Assigned</i>
+and set the corresponding user as the assignee.
+    <br/>
+    The method throws an exception if the ticket is in state <i>Closed</i>, the ticket id or the username
+    are not valid, or the user does not belong to the <i>Maintainer</i> user class.
+</p>
+
+<p>The method <b>closeTicket()</b> accepts a ticket id and a description of the solution and sets
+the state of the ticket to <i>Closed</i>.
+    <br/>
+    The method throws an exception if the ticket is not in state <i>Assigned</i>.
+</p>
+
+<p>Class <i>Ticket</i> provides the getter methods  <b>getState()</b> to retrieve the current state
+of the ticket</p>, and <b>getSolutionDescription()</b> for the description of the solution; it throws
+an exception if the ticket is not in the <i>Closed</i> state.
+
+
+
+<h2>R5: Statistics</h2>
+    
+<p>The method <b>countBySeverityOfState()</b> accepts a ticket state and returns a sorted map (keys sorted in natural order) with the number of  
+tickets per Severity, considering only the tickets with the specific state or all tickets
+if the argument is <i>null</i>.</p>
+
+<p>The method <b>topMaintainers()</b> returns a list strings formatted as <i>"username:###"</i> where <i>username</i> is the user name
+and <i>###</i> is the number of closed tickets; the list is sorter by descending
+number of closed tickets and then by username.</p>
+
+<!--
+<p>The method <b>countByStateOfComponent()</b> accepts a component path and returns a map with the number of  
+tickets per State, considering only the tickets relative to the specific component or for all the tickets
+if the argument is <i>null</i>.</p>
+
+<p>The method <b>countByStateOfComponentRecursive()</b> accepts a component path and returns a map with the number of  
+tickets per State, considering only the tickets relative to the specific component and all sub-components or for all the tickets if the argument is <i>null</i>.</p>
+-->
+
+</body>
+</html>
